@@ -22,7 +22,7 @@ function costToAcceleration(cost: number) {
 }
 
 function costToScope(cost: number) {
-    return 24 + cost / 2;
+    return 18 + cost / 4;
 }
 
 function costToArmor(cost: number) {
