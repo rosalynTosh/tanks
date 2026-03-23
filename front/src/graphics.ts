@@ -9,6 +9,8 @@ import { Tank, TANK_WIDTH, TankPosition, TurretType } from "./tank";
 const RECOIL_DURATION_MS = 25;
 const RECOIL_RETURN_DURATION_MS = 85;
 
+const BASE_SCALE_DIST = 28;
+
 export class Graphics {
     private canvasMgr: CanvasManager;
     private settings: Settings;
@@ -169,7 +171,7 @@ export class Graphics {
         this.ctx.restore();
     }
 
-    private drawTankHpBar(tank: Tank, time: Date) {
+    private drawTankHpBar(tank: Tank, time: Date, scaleDist: number) {
         this.ctx.save();
 
         const predictedPosition = tank.getPredictedPositionAtClientTime(time); // TODO: synchronize date?
@@ -180,13 +182,18 @@ export class Graphics {
         this.ctx.strokeStyle = "#000";
         this.ctx.lineWidth = 0.05;
 
-        this.ctx.fillRect(-0.46875, -0.475, 0.9375, 0.05);
-        this.ctx.strokeRect(-0.46875, -0.475, 0.9375, 0.05);
+        const scaleModifier = Math.sqrt(scaleDist / BASE_SCALE_DIST);
+
+        const hpBarWidth = 1 * scaleModifier + 0.25;
+        const hpBarHeight = 0.075 * scaleModifier + 0.025;
+
+        this.ctx.fillRect(-hpBarWidth / 2, -0.425 - hpBarHeight, hpBarWidth, hpBarHeight);
+        this.ctx.strokeRect(-hpBarWidth / 2, -0.425 - hpBarHeight, hpBarWidth, hpBarHeight);
 
         const scaledHitPoints = tank.getScaledHitPoints();
 
         this.ctx.fillStyle = "hsl(" + (Math.max(scaledHitPoints - 0.125, 0) * 120 / 0.875) + ", 100%, 40%)";
-        this.ctx.fillRect(-0.46875, -0.475, 0.9375 * scaledHitPoints, 0.05);
+        this.ctx.fillRect(-hpBarWidth / 2, -0.425 - hpBarHeight, hpBarWidth * scaledHitPoints, hpBarHeight);
 
         this.ctx.restore();
     }
@@ -206,8 +213,8 @@ export class Graphics {
         this.ctx.fillStyle = "#fff";
         this.ctx.lineWidth = 0.0375 * scale;
 
-        this.ctx.strokeText(tank.customization.displayName, 0, -0.525 * scale);
-        this.ctx.fillText(tank.customization.displayName, 0, -0.525 * scale);
+        this.ctx.strokeText(tank.customization.displayName, 0, -0.55 * scale);
+        this.ctx.fillText(tank.customization.displayName, 0, -0.55 * scale);
 
         this.ctx.restore();
     }
@@ -301,7 +308,8 @@ export class Graphics {
             this.lastPlayerPosition = playerPosition = this.state.player.position;
         }
 
-        const scale = Math.sqrt(this.canvasMgr.width * this.canvasMgr.height) / (this.state.player === undefined ? 24 : this.state.player.customization.scope);
+        const scaleDist = this.state.player === undefined ? 28 : this.state.player.customization.scope;
+        const scale = Math.sqrt(this.canvasMgr.width * this.canvasMgr.height) / scaleDist;
 
         this.ctx.save();
 
@@ -321,7 +329,7 @@ export class Graphics {
         for (const [tankId, tank] of this.state.tanks) {
             if (this.state.player === undefined || tankId != this.state.player.id) {
                 this.drawTankBody(tank, time);
-                this.drawTankHpBar(tank, time);
+                this.drawTankHpBar(tank, time, scaleDist);
             }
         }
 
@@ -331,7 +339,7 @@ export class Graphics {
 
         if (this.state.player !== undefined && this.state.player.customization.turretType != TurretType.None) {
             this.drawTankTurret(this.state.player, time);
-            this.drawTankHpBar(this.state.player, time);
+            this.drawTankHpBar(this.state.player, time, scaleDist);
         }
 
         for (const [tankId, tank] of this.state.tanks) {
