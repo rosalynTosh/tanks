@@ -100,15 +100,24 @@ export class PlayerTank extends Tank {
 
         const zoomIsDown = this.controls.isBindDown("zoom");
 
-        const friction = Math.hypot(this.position.dx, this.position.dy);
-        const frictionDir = Math.atan2(-this.position.dy, -this.position.dx);
+        const frictionSpeed = Math.hypot(this.position.dx, this.position.dy);
 
-        if (friction < this.customization.acceleration * diff) {
-            this.position.dx = 0;
-            this.position.dy = 0;
-        } else {
-            this.position.dx += Math.cos(frictionDir) * this.customization.acceleration * diff;
-            this.position.dy += Math.sin(frictionDir) * this.customization.acceleration * diff;
+        if (frictionSpeed != 0) {
+            const frictionCompInline = Math.abs((this.position.dx * Math.cos(this.position.dir) + this.position.dy * Math.sin(this.position.dir)) / frictionSpeed);
+            const frictionCompOrthog = 1 - frictionCompInline;
+
+            console.log("inline: " + frictionCompInline + "; orthog: " + frictionCompOrthog);
+
+            const friction = (this.customization.acceleration * frictionCompInline + (this.customization.acceleration * 2 + 2) * frictionCompOrthog) * diff;
+            const frictionDir = Math.atan2(-this.position.dy, -this.position.dx);
+
+            if (frictionSpeed < friction) {
+                this.position.dx = 0;
+                this.position.dy = 0;
+            } else {
+                this.position.dx += Math.cos(frictionDir) * friction;
+                this.position.dy += Math.sin(frictionDir) * friction;
+            }
         }
 
         const speed = Math.hypot(this.position.dx, this.position.dy);
