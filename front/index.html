@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Tanks</title>
+
+        <link rel="stylesheet" href="styles.css">
+    </head>
+
+    <body>
+        <canvas id="display"></canvas>
+
+        <div id="chooserRootCont">
+            <div>
+                <div class="displayNameCol">
+                    <div class="displayNameCont">
+                        <h2>Display Name</h2>
+                        <input type="text" id="displayName" placeholder="Player"/>
+                        <p id="invalid"></p>
+                        <p id="connecting">Connecting...</p>
+                        <button id="dropIn" disabled>Drop In</button>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="customizeCol">
+                    <div class="customize">
+                        <h1>Customize</h1>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Movement Speed (<span id="movementSpeedPrintout"></span> m/s)</h3>
+                                <p id="movementSpeedCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="movementSpeed" min="0" max="100" step="1" value="50"/>
+                                <span>$100</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Turning Speed (<span id="turningSpeedPrintout"></span> rot/s)</h3>
+                                <p id="turningSpeedCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="turningSpeed" min="0" max="20" step="0.2" value="10"/>
+                                <span>$20</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Acceleration (<span id="accelerationPrintout"></span> m/s²)</h3>
+                                <p id="accelerationCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="acceleration" min="0" max="20" step="0.2" value="10"/>
+                                <span>$20</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Scope/Visibility (<span id="scopePrintout"></span> m)</h3>
+                                <p id="scopeCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="scope" min="0" max="80" step="0.8" value="0"/>
+                                <span>$80</span>
+                            </div>
+                        </div>
+
+                        <h2>Defense</h2>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Armor (10 base + <span id="armorPrintout"></span> HP)</h3>
+                                <p id="armorCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="armor" min="0" max="200" step="1" value="70"/>
+                                <span>$200</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Crushing Damage (<span id="crushingDamagePrintout"></span> HP/s)</h3>
+                                <p id="crushingDamageCost"></p>
+                            </div>
+
+                            <p>Damages tanks you collide with</p>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="crushingDamage" min="0" max="80" step="0.8" value="0"/>
+                                <span>$80</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Knockback (<span id="knockbackPrintout"></span> m/s/HP)</h3>
+                                <p id="knockbackCost"></p>
+                            </div>
+
+                            <p>Reduces how much knockback shooting or getting shot causes</p>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="crushingDamage" min="0" max="60" step="0.6" value="20"/>
+                                <span>$60</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Shield</h3>
+                                <p id="shieldCost">$0</p>
+                            </div>
+
+                            <p>Nullifies damage for 2s after you first take damage</p>
+
+                            <input type="checkbox" id="shield"/>
+                            <label for="shield">Shield ($25)</label>
+                        </div>
+
+                        <h2>Turret</h2>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Turret Type</h3>
+                                <p id="turretTypeCost"></p>
+                            </div>
+
+                            <div class="turretTypes">
+                                <div>
+                                    <input type="radio" name="turretType" value="single" id="turretTypeSingle" checked/>
+
+                                    <label for="turretTypeSingle">
+                                        <canvas id="singleCanvas" width="56" height="56"></canvas>
+                                        <p>Single (<span id="turretTypeSingleCost"></span>)</p>
+                                    </label>
+
+                                    <input type="radio" name="turretType" value="fixed" id="turretTypeFixed"/>
+
+                                    <label for="turretTypeFixed">
+                                        <canvas id="fixedCanvas" width="56" height="56"></canvas>
+                                        <p>Fixed (<span id="turretTypeFixedCost"></span>)</p>
+                                    </label>
+                                    
+                                    <input type="radio" name="turretType" value="none" id="turretTypeNone"/>
+
+                                    <label for="turretTypeNone">
+                                        <canvas id="noneCanvas" width="56" height="56"></canvas>
+                                        <p>None (<span id="turretTypeNoneCost"></span>)</p>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="turretType" value="double" id="turretTypeDouble"/>
+
+                                    <label for="turretTypeDouble">
+                                        <canvas id="doubleCanvas" width="56" height="56"></canvas>
+                                        <p>Double (<span id="turretTypeDoubleCost"></span>)</p>
+                                    </label>
+                                    
+                                    <input type="radio" name="turretType" value="quad" id="turretTypeQuad"/>
+
+                                    <label for="turretTypeQuad">
+                                        <canvas id="quadCanvas" width="56" height="56"></canvas>
+                                        <p>Quad (<span id="turretTypeQuadCost"></span>)</p>
+                                    </label>
+                                    
+                                    <input type="radio" name="turretType" value="multi" id="turretTypeMulti"/>
+
+                                    <label for="turretTypeMulti">
+                                        <canvas id="multiCanvas" width="56" height="56"></canvas>
+                                        <p>Multi (<span id="turretTypeMultiCost"></span>)</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Damage (<span id="damagePrintout"></span> HP)</h3>
+                                <p id="damageCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="damage" min="0" max="100" step="1" value="50"/>
+                                <span>$100</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Shot Cooldown (<span id="cooldownPrintout"></span> s)</h3>
+                                <p id="cooldownCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="cooldown" min="0" max="100" step="1" value="50"/>
+                                <span>$100</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Accuracy (<span id="accuracyPrintout"></span>°)</h3>
+                                <p id="accuracyCost"></p>
+                            </div>
+
+                            <div class="rangeCont">
+                                <span>$0</span>
+                                <input type="range" id="accuracy" min="0" max="40" step="0.4" value="20"/>
+                                <span>$40</span>
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Piercing Bullets</h3>
+                                <p id="piercingCost">$0</p>
+                            </div>
+
+                            <p>Bullets punch through multiple tanks</p>
+
+                            <input type="checkbox" id="piercing"/>
+                            <label for="piercing">Piercing ($15)</label>
+                        </div>
+
+                        <div class="stat">
+                            <div class="statTitle">
+                                <h3>Full-Auto</h3>
+                                <p id="fullAutoCost">$20</p>
+                            </div>
+                            
+                            <p>Fire multiple times without releasing your mouse, -10% shot cooldown.</p>
+
+                            <input type="checkbox" id="fullAuto"/>
+                            <label for="fullAuto">Full-auto ($20)</label>
+                        </div>
+                    </div>
+
+                    <div class="cost">
+                        <p class="budgetRow"><b>Budget:</b><span class="budget"></span></p>
+                        <p class="buildCostRow"><b>Build Cost:</b><span class="buildCost"></span></p>
+                    </div>
+                    
+                    
+                    <!--<p class="budgetDiffRow"><b></b><span><span class="budgetDiff"></span></span></p>-->
+                    <!--<p class="clippyRow"><span class="clippy"></span></p>-->
+                </div>
+            </div>
+        </div>
+        
+        <script type="module" src="/src/index.ts"></script>
+    </body>
+</html>
