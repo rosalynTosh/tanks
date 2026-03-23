@@ -3,7 +3,7 @@ import { Controls } from "./controls";
 import { GameState } from "./gameState";
 import { GameObject } from "./object";
 import { Settings } from "./settings";
-import { Tank, TankCustomization, TankPosition, TurretPosition, TurretType } from "./tank";
+import { Tank, TANK_LENGTH, TANK_WIDTH, TankCustomization, TankPosition, TurretPosition, TurretType } from "./tank";
 
 //function rectRadiusAtAngle(width: number, height: number, angle: number): number {
 //    return Math.min(
@@ -121,8 +121,8 @@ export class PlayerTank extends Tank {
         const tankCorners = boxCorners({
             x: this.position.x,
             y: this.position.y,
-            width: 1,
-            height: 0.875,
+            width: TANK_LENGTH,
+            height: TANK_WIDTH,
             rot: this.position.dir
         });
 

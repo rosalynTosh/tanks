@@ -1,3 +1,6 @@
+export const TANK_LENGTH = 1;
+export const TANK_WIDTH = 0.75;
+
 export interface TankPosition {
     x: number;
     dx: number;

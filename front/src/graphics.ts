@@ -4,7 +4,7 @@ import { GameState } from "./gameState";
 import { GameObject } from "./object";
 import { PlayerTank } from "./playerTank";
 import { Settings } from "./settings";
-import { Tank, TankPosition, TurretType } from "./tank";
+import { Tank, TANK_WIDTH, TankPosition, TurretType } from "./tank";
 
 const RECOIL_DURATION_MS = 25;
 const RECOIL_RETURN_DURATION_MS = 85;
@@ -78,7 +78,7 @@ export class Graphics {
         this.ctx.strokeStyle = "#000";
         this.ctx.lineWidth = 0.025;
 
-        const tankHalfWidth = 0.4375;
+        const tankHalfWidth = TANK_WIDTH / 2;
         
         this.ctx.fillStyle = "#444";
 
@@ -90,19 +90,11 @@ export class Graphics {
         this.ctx.fillStyle = "#eee";
 
         this.ctx.beginPath();
-        this.ctx.moveTo(0.5, -tankHalfWidth);
-        this.ctx.lineTo(0.5, tankHalfWidth);
+        this.ctx.moveTo(0.4375, -tankHalfWidth);
+        this.ctx.lineTo(0.5625, 0);
+        this.ctx.lineTo(0.4375, tankHalfWidth);
         this.ctx.lineTo(-0.5, tankHalfWidth);
         this.ctx.lineTo(-0.5, -tankHalfWidth);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(0.5, -0.28125);
-        this.ctx.lineTo(0.625, -0.125);
-        this.ctx.lineTo(0.625, 0.125);
-        this.ctx.lineTo(0.5, 0.28125);
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
