@@ -275,7 +275,7 @@ export class PlayerTank extends Tank {
 
     private canShootBindDown(): boolean {
         if (this.customization.turretType == TurretType.None) return false;
-        if (!(this.customization.fullAuto || this.customization.turretType == TurretType.Multi)) return false;
+        if (!this.customization.fullAuto) return false;
 
         return this.lastShotTime === undefined || (new Date().getTime() - this.lastShotTime.getTime()) / 1000 >= this.manualCooldown() * 1.5;
     }
@@ -288,6 +288,7 @@ export class PlayerTank extends Tank {
 
     private canShootSideTurretsBindDown(): boolean {
         if (this.customization.turretType != TurretType.Multi) return false;
+        if (!this.customization.fullAuto) return false;
 
         return this.lastSideTurretShotTime === undefined || (new Date().getTime() - this.lastSideTurretShotTime.getTime()) / 1000 >= this.manualCooldown() / 2 * 1.5;
     }

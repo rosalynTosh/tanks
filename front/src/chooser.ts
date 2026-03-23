@@ -34,16 +34,16 @@ function costToCrushingDamage(cost: number) {
 }
 
 function costToDamageAndCooldown(damageCost: number, cooldownCost: number): { damage: number, cooldown: number } {
-    //return {
-    //    damage: damageCost ** 2 / 100 + 0.01,
-    //    // cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) + damageCost ** 1.5 / 500) * 0.95 / (25.01 / 25 + Math.SQRT1_2) + 0.05
-    //    cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) * (1.5 ** (damageCost / 50 - 1)) + damageCost ** 1.5 / 1000) / 1.25949152613 + 0.025
-    //};
-
     return {
-        damage: 2.048 * 1.03985 ** damageCost - 1.948,
-        cooldown: 0.025
+       damage: damageCost ** 2 / 100 + 0.01,
+       // cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) + damageCost ** 1.5 / 500) * 0.95 / (25.01 / 25 + Math.SQRT1_2) + 0.05
+       cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) * (1.5 ** (damageCost / 50 - 1)) + damageCost ** 1.5 / 1000) / 1.25949152613 + 0.025
     };
+
+    // return {
+    //     damage: 2.048 * 1.03985 ** damageCost - 1.948,
+    //     cooldown: 0.025
+    // };
 }
 
 function costToAccuracy(cost: number) {
