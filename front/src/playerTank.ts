@@ -340,11 +340,16 @@ export class PlayerTank extends Tank {
     }
 
     private shootSideTurrets() {
+        const recoilAccel = 0.0375 + 0.625 * Math.sqrt(this.customization.damage) / 10 * Math.sqrt(this.customization.acceleration);
+        
         const sideBarrelLength = this.sideTurretBarrelLength();
         const sideBarrelBulletOffset = this.sideTurretOffset() / 2 + 0.1;
 
         this.shootInDir(this.turretPosition.dir, sideBarrelLength, this.customization.accuracy / 2, 1/2, -sideBarrelBulletOffset);
-        this.shootInDir(this.turretPosition.dir, sideBarrelLength, this.customization.accuracy / 2, 1/2, sideBarrelBulletOffset);
+        this.shootInDir(this.turretPosition.dir, sideBarrelLength, this.customization.accuracy / 2, 1 / 2, sideBarrelBulletOffset);
+
+        this.position.dx -= Math.cos(this.turretPosition.dir) * recoilAccel;
+        this.position.dy -= Math.sin(this.turretPosition.dir) * recoilAccel;
 
         this.lastSideTurretShotTime = new Date();
     }
