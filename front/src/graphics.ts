@@ -198,23 +198,26 @@ export class Graphics {
         this.ctx.restore();
     }
 
-    private drawTankDisplayName(tank: Tank, time: Date, scale: number) {
+    private drawTankDisplayName(tank: Tank, time: Date, scale: number, scaleDist: number) {
         this.ctx.save();
 
         const predictedPosition = tank.getPredictedPositionAtClientTime(time); // TODO: synchronize date?
 
         this.ctx.translate(predictedPosition.x * scale, predictedPosition.y * scale);
 
+        const scaleModifier = Math.sqrt(scaleDist / BASE_SCALE_DIST);
+        const modScale = scale * scaleModifier;
+
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "bottom";
-        this.ctx.font = "bold " + Math.round(scale * 0.1875) + "px system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
+        this.ctx.font = "bold " + Math.round(modScale * 0.1875) + "px system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
 
         this.ctx.strokeStyle = "#000";
         this.ctx.fillStyle = "#fff";
-        this.ctx.lineWidth = 0.0375 * scale;
+        this.ctx.lineWidth = 0.0375 * modScale;
 
-        this.ctx.strokeText(tank.customization.displayName, 0, -0.55 * scale);
-        this.ctx.fillText(tank.customization.displayName, 0, -0.55 * scale);
+        this.ctx.strokeText(tank.customization.displayName, 0, -0.425 * scale - 0.125 * modScale);
+        this.ctx.fillText(tank.customization.displayName, 0, -0.425 * scale - 0.125 * modScale);
 
         this.ctx.restore();
     }
@@ -364,12 +367,12 @@ export class Graphics {
 
         for (const [tankId, tank] of this.state.tanks) {
             if (this.state.player === undefined || tankId != this.state.player.id) {
-                this.drawTankDisplayName(tank, time, scale);
+                this.drawTankDisplayName(tank, time, scale, scaleDist);
             }
         }
 
         if (this.state.player !== undefined) {
-            this.drawTankDisplayName(this.state.player, time, scale);
+            this.drawTankDisplayName(this.state.player, time, scale, scaleDist);
         }
 
         this.ctx.restore();
