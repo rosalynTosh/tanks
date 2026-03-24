@@ -33,6 +33,14 @@ function boxCorners(box: GameObject): [[number, number], [number, number], [numb
     ];
 }
 
+interface ShootInDirOptions {
+    barrelLength?: number;
+    accuracy?: number;
+    size?: number;
+    offset?: number;
+    dirOffset?: number;
+}
+
 const SNEAK_MULTIPLIER = 0.25;
 const SNEAK_TURN_MULTIPLIER = 0.25;
 
@@ -286,7 +294,7 @@ export class PlayerTank extends Tank {
         if (this.customization.turretType == TurretType.None) return false;
         if (!this.customization.fullAuto) return false;
 
-        return this.lastShotTime === undefined || (new Date().getTime() - this.lastShotTime.getTime()) / 1000 >= this.manualCooldown() * 1.5;
+        return this.lastShotTime === undefined || (new Date().getTime() - this.lastShotTime.getTime()) / 1000 >= Math.min(this.manualCooldown() * 1.5, this.manualCooldown() + 0.2);
     }
 
     private canShootSideTurrets(): boolean {
@@ -299,7 +307,7 @@ export class PlayerTank extends Tank {
         if (this.customization.turretType != TurretType.Multi) return false;
         if (!this.customization.fullAuto) return false;
 
-        return this.lastSideTurretShotTime === undefined || (new Date().getTime() - this.lastSideTurretShotTime.getTime()) / 1000 >= this.manualCooldown() / 2 * 1.5;
+        return this.lastSideTurretShotTime === undefined || (new Date().getTime() - this.lastSideTurretShotTime.getTime()) / 1000 >= Math.min(this.manualCooldown() / 2 * 1.5, this.manualCooldown() / 2 + 0.1);
     }
 
     private shoot() {
@@ -327,26 +335,36 @@ export class PlayerTank extends Tank {
                 this.shootInDir(this.turretPosition.dir + Math.PI * 3/2);
                 break;
             case TurretType.Multi:
-                this.shootInDir(this.turretPosition.dir);
-                this.shootSideTurrets();
+                const dirOffset = this.normRandomDirOffset(this.customization.accuracy / 180 * Math.PI);
+
+                this.shootInDir(this.turretPosition.dir, { dirOffset });
+                this.shootSideTurrets(dirOffset);
                 this.position.dx -= Math.cos(this.turretPosition.dir) * recoilAccel;
                 this.position.dy -= Math.sin(this.turretPosition.dir) * recoilAccel;
                 break;
         }
 
         this.lastShotTime = new Date();
-        
-        this.hitPoints -= 1;
     }
 
-    private shootSideTurrets() {
+    private shootSideTurrets(baseDirOffset: number = this.normRandomDirOffset(this.customization.accuracy / 180 * Math.PI)) {
         const recoilAccel = 0.0375 + 0.625 * Math.sqrt(this.customization.damage) / 10 * Math.sqrt(this.customization.acceleration);
         
         const sideBarrelLength = this.sideTurretBarrelLength();
         const sideBarrelBulletOffset = this.sideTurretOffset() / 2 + 0.1;
 
-        this.shootInDir(this.turretPosition.dir, sideBarrelLength, this.customization.accuracy / 2, 1/2, -sideBarrelBulletOffset);
-        this.shootInDir(this.turretPosition.dir, sideBarrelLength, this.customization.accuracy / 2, 1 / 2, sideBarrelBulletOffset);
+        this.shootInDir(this.turretPosition.dir + baseDirOffset, {
+            barrelLength: sideBarrelLength,
+            accuracy: this.customization.accuracy / 2,
+            size: 1 / 2,
+            offset: -sideBarrelBulletOffset
+        });
+        this.shootInDir(this.turretPosition.dir + baseDirOffset, {
+            barrelLength: sideBarrelLength,
+            accuracy: this.customization.accuracy / 2,
+            size: 1 / 2,
+            offset: sideBarrelBulletOffset
+        });
 
         this.position.dx -= Math.cos(this.turretPosition.dir) * recoilAccel;
         this.position.dy -= Math.sin(this.turretPosition.dir) * recoilAccel;
@@ -376,11 +394,17 @@ export class PlayerTank extends Tank {
         return offset;
     }
 
-    private shootInDir(dir: number, barrelLength: number = this.barrelLength(), accuracy: number = this.customization.accuracy, size: number = 1, offset: number = 0) {
+    private shootInDir(dir: number, options: ShootInDirOptions = {}) {
+        const barrelLength = options.barrelLength ?? this.barrelLength();
+        const accuracy = options.accuracy ?? this.customization.accuracy;
+        const size = options.size ?? 1;
+        const offset = options.offset ?? 0;
+        const dirOffset = options.dirOffset ?? this.normRandomDirOffset(accuracy / 180 * Math.PI)
+
         this.state.shootBullet({
             initX: this.position.x + Math.cos(dir + Math.PI / 2) * offset + Math.cos(dir) * (barrelLength + 0.25),
             initY: this.position.y + Math.sin(dir + Math.PI / 2) * offset + Math.sin(dir) * (barrelLength + 0.25),
-            dir: dir + this.normRandomDirOffset(accuracy / 180 * Math.PI),
+            dir: dir + dirOffset,
             size,
             fadeStartTime: new Date(),
             ownerTankId: this.id

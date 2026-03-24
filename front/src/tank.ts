@@ -83,7 +83,7 @@ export abstract class Tank {
     }
 
     public sideTurretOffset(): number {
-        return 0.1 - this.customization.accuracyCost / 40 * 0.05;
+        return 0.125 - this.customization.accuracyCost / 40 * 0.05;
     }
 
     public sideTurretBarrelLength(): number {

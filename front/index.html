@@ -149,11 +149,11 @@
 
                             <div class="turretTypes">
                                 <div>
-                                    <input type="radio" name="turretType" value="single" id="turretTypeSingle" checked/>
+                                    <input type="radio" name="turretType" value="none" id="turretTypeNone"/>
 
-                                    <label for="turretTypeSingle">
-                                        <canvas id="singleCanvas" width="56" height="56"></canvas>
-                                        <p>Single (<span id="turretTypeSingleCost"></span>)</p>
+                                    <label for="turretTypeNone">
+                                        <canvas id="noneCanvas" width="56" height="56"></canvas>
+                                        <p>None (<span id="turretTypeNoneCost"></span>)</p>
                                     </label>
 
                                     <input type="radio" name="turretType" value="fixed" id="turretTypeFixed"/>
@@ -162,12 +162,12 @@
                                         <canvas id="fixedCanvas" width="56" height="56"></canvas>
                                         <p>Fixed (<span id="turretTypeFixedCost"></span>)</p>
                                     </label>
-                                    
-                                    <input type="radio" name="turretType" value="none" id="turretTypeNone"/>
 
-                                    <label for="turretTypeNone">
-                                        <canvas id="noneCanvas" width="56" height="56"></canvas>
-                                        <p>None (<span id="turretTypeNoneCost"></span>)</p>
+                                    <input type="radio" name="turretType" value="single" id="turretTypeSingle" checked/>
+
+                                    <label for="turretTypeSingle">
+                                        <canvas id="singleCanvas" width="56" height="56"></canvas>
+                                        <p>Single (<span id="turretTypeSingleCost"></span>)</p>
                                     </label>
                                 </div>
                                 <div>
@@ -220,6 +220,8 @@
                                 <span>$100</span>
                             </div>
                         </div>
+
+                        <p><b>Single-turret DPS:</b> <span class="dps"></span></p>
 
                         <div class="stat">
                             <div class="statTitle">

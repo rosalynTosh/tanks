@@ -33,17 +33,24 @@ function costToCrushingDamage(cost: number) {
     return cost / 4;
 }
 
-function costToDamageAndCooldown(damageCost: number, cooldownCost: number): { damage: number, cooldown: number } {
-    return {
-       damage: damageCost ** 2 / 100 + 0.01,
-       // cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) + damageCost ** 1.5 / 500) * 0.95 / (25.01 / 25 + Math.SQRT1_2) + 0.05
-       cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) * (1.5 ** (damageCost / 50 - 1)) + damageCost ** 1.5 / 1000) / 1.25949152613 + 0.025
-    };
+function costToDamageAndCooldown(damageCost: number, cooldownCost: number): { damage: number, cooldown: number, dps: number } {
+    // return {
+    //    damage: damageCost ** 2 / 100 + 0.01,
+    //    // cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) + damageCost ** 1.5 / 500) * 0.95 / (25.01 / 25 + Math.SQRT1_2) + 0.05
+    //    cooldown: (((100 - cooldownCost) ** 2 / 100 + 0.01) / (20 + 5 * ((100 - cooldownCost) / 50) ** 2) * (1.5 ** (damageCost / 50 - 1)) + damageCost ** 1.5 / 1000) / 1.25949152613 + 0.025
+    // };
 
     // return {
     //     damage: 2.048 * 1.03985 ** damageCost - 1.948,
     //     cooldown: 0.025
     // };
+
+    const damage = 20 ** (damageCost / 100 * 2);
+    // const dps = 10 ** ((damageCost * 2 + cooldownCost) / 75) / 30;
+    const dps = (damageCost * 3 + cooldownCost * 2 + 100) ** 3 / 1000000;
+    const cooldown = damage / dps;
+
+    return { damage, cooldown, dps };
 }
 
 function costToAccuracy(cost: number) {
@@ -64,6 +71,7 @@ export class Chooser {
 
     private budgetPrintouts: HTMLCollectionOf<HTMLSpanElement>;
     private buildCostPrintouts: HTMLCollectionOf<HTMLSpanElement>;
+    private dpsPrintouts: HTMLCollectionOf<HTMLSpanElement>;
 
     private movementSpeedPrintout: HTMLSpanElement;
     private movementSpeedCost: HTMLParagraphElement;
@@ -130,6 +138,7 @@ export class Chooser {
 
         this.budgetPrintouts = document.getElementsByClassName("budget") as HTMLCollectionOf<HTMLSpanElement>;
         this.buildCostPrintouts = document.getElementsByClassName("buildCost") as HTMLCollectionOf<HTMLSpanElement>;
+        this.dpsPrintouts = document.getElementsByClassName("dps") as HTMLCollectionOf<HTMLSpanElement>;
 
         this.movementSpeedPrintout = document.getElementById("movementSpeedPrintout") as HTMLSpanElement;
         this.movementSpeedCost = document.getElementById("movementSpeedCost") as HTMLParagraphElement;
@@ -336,6 +345,7 @@ export class Chooser {
             this.cooldownPrintout.textContent = String(Math.round((cooldown * (this.fullAuto.checked ? 0.9 : 1)) * 100) / 100);
 
             this.updateBuildCost();
+            this.updateDps();
         };
 
         this.damage.addEventListener("input", turretListener);
@@ -375,7 +385,6 @@ export class Chooser {
             this.fullAutoCost.textContent = !this.turretTypeNone.checked && this.fullAuto.checked ? "$20.00" : "$0.00";
 
             turretListener();
-            this.updateBuildCost();
         });
 
         fullAutoListener();
@@ -408,7 +417,7 @@ export class Chooser {
         }
     }
 
-    private computeBuildCost() {
+    private computeBuildCost(): number {
         return (
             Number(this.movementSpeed.value) +
             Number(this.turningSpeed.value) +
@@ -436,6 +445,26 @@ export class Chooser {
         }
 
         this.updateInvalid();
+    }
+
+    private computeDps(): number {
+        return costToDamageAndCooldown(Number(this.damage.value), Number(this.cooldown.value)).dps / (this.fullAuto.checked ? 0.9 : 1);
+    }
+
+    private computeFullAutoDps(): number {
+        const { damage, cooldown } = costToDamageAndCooldown(Number(this.damage.value), Number(this.cooldown.value));
+        const manualCooldown = cooldown / 0.9;
+        const fullAutoCooldown = Math.min(manualCooldown * 1.5, manualCooldown + 0.2);
+
+        return damage / fullAutoCooldown;
+    }
+
+    private updateDps() {
+        const dps = this.computeDps();
+
+        for (const dpsPrintout of this.dpsPrintouts) {
+            dpsPrintout.textContent = dps.toFixed(2) + (this.fullAuto.checked ? " (full-auto: " + this.computeFullAutoDps().toFixed(2) + ")" : "");
+        }
     }
 
     private updateInvalid() {
